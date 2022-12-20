@@ -46,8 +46,7 @@ func NewSystemTable(conn db.Connection, c *config.Config) *SystemTable {
 func (s *SystemTable) GetManagerTable(ctx *context.Context) (managerTable Table) {
 	managerTable = NewDefaultTable(DefaultConfigWithDriver(config.GetDatabases().GetDefault().Driver))
 
-	info := managerTable.GetInfo().AddXssJsFilter().HideFilterArea()
-
+	info := managerTable.GetInfo().AddXssJsFilter().HideFilterArea().HideDeleteButton().HideExportButton().HideCheckBoxColumn()
 	info.AddField("ID", "id", db.Int).FieldSortable()
 	info.AddField(lg("Name"), "username", db.Varchar).FieldFilterable()
 	info.AddField(lg("Nickname"), "name", db.Varchar).FieldFilterable()
@@ -453,11 +452,14 @@ func (s *SystemTable) GetNormalManagerTable(ctx *context.Context) (managerTable 
 
 	formList.SetTable("goadmin_users").SetTitle(lg("Managers")).SetDescription(lg("Managers"))
 	formList.SetUpdateFn(func(values form2.Values) error {
+		u, _ := ctx.UserValue["user"].(models.UserModel)
+		if !u.IsSuperAdmin() && strconv.Itoa(int(u.Id)) != values.Get("id") {
+			return errors.New(errs.NoPermission)
+		}
 
 		if values.IsEmpty("name", "username") {
 			return errors.New("username and password can not be empty")
 		}
-
 		user := models.UserWithId(values.Get("id")).SetConn(s.conn)
 
 		if values.Has("permission", "role") {
