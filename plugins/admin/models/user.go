@@ -361,10 +361,12 @@ func (t UserModel) WithMenus() UserModel {
 func (t UserModel) New(username, password, name, avatar string) (UserModel, error) {
 
 	id, err := t.WithTx(t.Tx).Table(t.TableName).Insert(dialect.H{
-		"username": username,
-		"password": password,
-		"name":     name,
-		"avatar":   avatar,
+		"username":   username,
+		"password":   password,
+		"name":       name,
+		"avatar":     avatar,
+		"created_at": time.Now().Format("2006-01-02 15:04:05"),
+		"updated_at": time.Now().Format("2006-01-02 15:04:05"),
 	})
 
 	t.Id = id

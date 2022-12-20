@@ -7,7 +7,7 @@ package language
 import "strings"
 
 var cn = LangSet{
-	"managers":  "管理员管理",
+	"managers":  "管理员",
 	"name":      "用户名",
 	"nickname":  "昵称",
 	"role":      "角色",
