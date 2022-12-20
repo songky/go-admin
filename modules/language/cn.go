@@ -105,6 +105,7 @@ var cn = LangSet{
 	"username and password can not be empty":        "用户名密码不能为空",
 	"operation not allow":                           "不允许的操作",
 	"password does not match":                       "密码不一致",
+	"password invalid":                              "密码长度至少8位，且必须包含大小写、数字、特殊字符",
 	"should be unique":                              "需要保证唯一",
 	"slug exists":                                   "标志已经存在了",
 	"no corresponding options?":                     "没找到对应选项？",

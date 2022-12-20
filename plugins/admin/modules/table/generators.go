@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/GoAdminGroup/go-admin/context"
 	"github.com/GoAdminGroup/go-admin/modules/collection"
@@ -76,7 +77,7 @@ func (s *SystemTable) GetManagerTable(ctx *context.Context) (managerTable Table)
 	formList.AddField(lg("password"), "password", db.Varchar, form.Password).
 		FieldDisplay(func(value types.FieldModel) interface{} {
 			return ""
-		})
+		}).FieldHelpMsg(template.HTML(lg("password invalid")))
 	formList.AddField(lg("confirm password"), "password_again", db.Varchar, form.Password).
 		FieldDisplay(func(value types.FieldModel) interface{} {
 			return ""
@@ -92,6 +93,9 @@ func (s *SystemTable) GetManagerTable(ctx *context.Context) (managerTable Table)
 		if password != "" {
 			if password != values.Get("password_again") {
 				return errors.New("password does not match")
+			}
+			if !passwordIsValid(password) {
+				return errors.New("password invalid")
 			}
 			password = encodePassword([]byte(values.Get("password")))
 		}
@@ -225,7 +229,7 @@ func (s *SystemTable) GetNormalManagerTable(ctx *context.Context) (managerTable 
 	formList.AddField(lg("password"), "password", db.Varchar, form.Password).
 		FieldDisplay(func(value types.FieldModel) interface{} {
 			return ""
-		})
+		}).FieldHelpMsg(template.HTML(lg("password invalid")))
 	formList.AddField(lg("confirm password"), "password_again", db.Varchar, form.Password).
 		FieldDisplay(func(value types.FieldModel) interface{} {
 			return ""
@@ -247,6 +251,9 @@ func (s *SystemTable) GetNormalManagerTable(ctx *context.Context) (managerTable 
 		if password != "" {
 			if password != values.Get("password_again") {
 				return errors.New("password does not match")
+			}
+			if !passwordIsValid(password) {
+				return errors.New("password invalid")
 			}
 			password = encodePassword([]byte(values.Get("password")))
 		}
@@ -1754,4 +1761,30 @@ func getType(typeName string) string {
 	typeName = r.ReplaceAllString(typeName, "")
 	r2, _ := regexp.Compile(`unsigned(.*)`)
 	return strings.TrimSpace(strings.Title(strings.ToLower(r2.ReplaceAllString(typeName, ""))))
+}
+
+func passwordIsValid(s string) bool {
+	var (
+		hasMinLen  = false
+		hasUpper   = false
+		hasLower   = false
+		hasNumber  = false
+		hasSpecial = false
+	)
+	if len(s) >= 8 {
+		hasMinLen = true
+	}
+	for _, char := range s {
+		switch {
+		case unicode.IsUpper(char):
+			hasUpper = true
+		case unicode.IsLower(char):
+			hasLower = true
+		case unicode.IsNumber(char):
+			hasNumber = true
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
+			hasSpecial = true
+		}
+	}
+	return hasMinLen && hasUpper && hasLower && hasNumber && hasSpecial
 }
