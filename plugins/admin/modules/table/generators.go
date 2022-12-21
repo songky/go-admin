@@ -60,7 +60,6 @@ func (s *SystemTable) GetManagerTable(ctx *context.Context) (managerTable Table)
 		info.AddField(lg("Name"), "username", db.Varchar)
 		info.AddField(lg("Nickname"), "name", db.Varchar)
 	}
-	info.AddField("ID", "id", db.Int).FieldSortable()
 	info.AddField(lg("createdAt"), "created_at", db.Timestamp)
 	info.AddField(lg("updatedAt"), "updated_at", db.Timestamp)
 
